@@ -3,10 +3,7 @@ package com.example.little.myqqlogindemo;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -23,7 +20,6 @@ import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
@@ -143,71 +139,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void updateUserInfo() {
-        if (mTencent != null && mTencent.isSessionValid()) {
-            IUiListener listener = new IUiListener() {
-                @Override
-                public void onError(UiError e) {
-                }
-                @Override
-                public void onComplete(final Object response) {
-                    Message msg = new Message();
-                    msg.obj = response;
-                    msg.what = 0;
-                    mHandler.sendMessage(msg);
-                    new Thread(){
-                        @Override
-                        public void run() {
-                            JSONObject json = (JSONObject)response;
-                            if(json.has("figureurl")){
-                                Bitmap bitmap = null;
-                                try {
-                                    bitmap = Util.getbitmap(json.getString("figureurl_qq_2"));
-                                } catch (JSONException e) {
-                                }
-                                Message msg = new Message();
-                                msg.obj = bitmap;
-                                msg.what = 1;
-                                mHandler.sendMessage(msg);
-                            }
-                        }
-                    }.start();
-                }
-                @Override
-                public void onCancel() {
-                }
-            };
-            mInfo = new UserInfo(this, mTencent.getQQToken());
-            mInfo.getUserInfo(listener);
-        }
-        else {
-            mUserInfo.setText("");
-            mUserInfo.setVisibility(android.view.View.GONE);
-            mUserLogo.setVisibility(android.view.View.GONE);
-        }
-    }
 
-    Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == 0) {
-                JSONObject response = (JSONObject) msg.obj;
-                if (response.has("nickname")) {
-                    try {
-                        mUserInfo.setVisibility(android.view.View.VISIBLE);
-                        mUserInfo.setText(response.getString("nickname"));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }else if(msg.what == 1){
-                Bitmap bitmap = (Bitmap)msg.obj;
-                mUserLogo.setImageBitmap(bitmap);
-                mUserLogo.setVisibility(android.view.View.VISIBLE);
-            }
-        }
 
-    };
     private class BaseUiListener implements IUiListener {
         @Override
         public void onComplete(Object response) {
