@@ -1,11 +1,9 @@
 package com.example.little.myqqlogindemo;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -14,16 +12,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tencent.connect.UserInfo;
-import com.tencent.connect.auth.QQToken;
 import com.tencent.connect.common.Constants;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
@@ -50,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 //        创建Tencent类实例:
         mTencent= Tencent.createInstance(APPID,this.getApplication());
-
         mNewLoginButton =  findViewById(R.id.button);
         mlogOutButton =  findViewById(R.id.button2);
         mUserInfo  =  findViewById(R.id.nick_name);
@@ -73,8 +66,11 @@ public class MainActivity extends AppCompatActivity {
         } else {
             jsonObject = mTencent.loadSession(APPID);
             mTencent.initSessionCache(jsonObject);
-            Util.showResultDialog(MainActivity.this, jsonObject.toString(), "登录成功");
-            updateUserInfo();
+//            Util.showResultDialog(MainActivity.this, jsonObject.toString(), "登录成功");
+//            updateUserInfo();
+            //跳转登陆成功页面
+            Intent intent = new Intent(this, HomeActivity.class);
+            startActivity(intent);
         }
         return false;
     }
@@ -124,7 +120,10 @@ public class MainActivity extends AppCompatActivity {
         protected void doComplete(JSONObject values) {
             Log.d("SDKQQAgentPref", "AuthorSwitch_SDK:" + SystemClock.elapsedRealtime());
             initOpenidAndToken(values);
-            updateUserInfo();
+//            updateUserInfo();
+            //跳转登录成功页面
+            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+            startActivity(intent);
         }
     };
 
@@ -221,8 +220,7 @@ public class MainActivity extends AppCompatActivity {
                 Util.showResultDialog(MainActivity.this, "返回为空", "登录失败");
                 return;
             }
-           Util.showResultDialog(MainActivity.this, response.toString(), "登录成功");
-
+//           Util.showResultDialog(MainActivity.this, response.toString(), "登录成功");
             doComplete((JSONObject)response);
         }
         protected void doComplete(JSONObject values) {
@@ -233,7 +231,6 @@ public class MainActivity extends AppCompatActivity {
         public void onError(UiError uiError) {
             Toast.makeText(getApplicationContext(), "登录失败", Toast.LENGTH_SHORT).show();
         }
-
         @Override
         public void onCancel() {
             Toast.makeText(getApplicationContext(), "登录取消", Toast.LENGTH_SHORT).show();
@@ -248,13 +245,8 @@ public class MainActivity extends AppCompatActivity {
                 requestCode == Constants.REQUEST_APPBAR) {
             Tencent.onActivityResultData(requestCode,resultCode,data,loginListener);
         }
-
         super.onActivityResult(requestCode, resultCode, data);
     }
-
-
-
-
 
 
 }
